@@ -1517,6 +1517,31 @@ runs:
         CONFIG_TRACEPOINTS=y
         EOF
 
+    - name: Add Docker cgroup v2 support
+      shell: bash
+      run: |
+        set -euo pipefail
+        echo "Add Docker cgroup v2 support"
+        cat >> "$COMMON_KERNEL_FOLDER/arch/arm64/configs/gki_defconfig" <<EOF
+        CONFIG_CGROUP_SCHED=y
+        CONFIG_FAIR_GROUP_SCHED=y
+        CONFIG_CFS_BANDWIDTH=y
+        CONFIG_CPUSETS=y
+        CONFIG_CGROUP_CPUACCT=y
+        CONFIG_CGROUP_DEVICE=y
+        CONFIG_CGROUP_FREEZER=y
+        CONFIG_MEMCG=y
+        CONFIG_MEMCG_SWAP=y
+        CONFIG_MEMCG_SWAP_ENABLED=y
+        CONFIG_BLK_CGROUP=y
+        CONFIG_BFQ_CGROUP_GROUP_IOSCHED=y
+        CONFIG_CGROUP_PERF=y
+        CONFIG_CGROUP_BPF=y
+        CONFIG_CGROUP_MISC=y
+        CONFIG_CGROUP_NET_PRIO=y
+        CONFIG_CGROUP_NET_CLASSID=y
+        EOF
+
     - name: Add RUST build configs
       shell: bash
       if: ${{ env.OP_RUST_BUILD == 'true' }}
