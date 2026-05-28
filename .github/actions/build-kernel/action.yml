@@ -1701,6 +1701,9 @@ runs:
             ;;
         esac
         
+        # Append cgroup_no_v1=all for pure cgroup v2 (Docker compatibility)
+        CURRENT_CMDLINE=$(sed -n 's/^CONFIG_CMDLINE="\(.*\)"/\1/p' "$OUT/.config")
+        scripts/config --file "$OUT/.config" --set-str CMDLINE "${CURRENT_CMDLINE} cgroup_no_v1=all"
         
         make LD="$COMMON_KERNEL_FOLDER/ld-wrapper" HOSTLD="$COMMON_KERNEL_FOLDER/ld-wrapper" O="$OUT" olddefconfig
         
