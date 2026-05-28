@@ -1510,10 +1510,7 @@ runs:
         set -euo pipefail
         echo "Add Docker cgroup v2 support"
         cat >> "$COMMON_KERNEL_FOLDER/arch/arm64/configs/gki_defconfig" <<EOF
-        CONFIG_CFS_BANDWIDTH=y
         CONFIG_MEMCG_SWAP=y
-        CONFIG_CGROUP_MISC=y
-        CONFIG_CGROUP_NET_CLASSID=y
         EOF
 
     - name: Add Build based configs
