@@ -1999,60 +1999,35 @@ runs:
             echo "KSU Version: ${KSUVER:-unknown}"
             echo "KSU commit SHA: ${KSU_SHA:-unknown}"
           fi
-          
-          if [ "$KSU_SHA" != "unknown" ]; then
-            if [ "${{ inputs.ksu_type }}" = "KSUN" ]; then
-              echo "| **KSUN Commit** | [\`${KSU_SHA:0:8}\`](https://github.com/KernelSU-Next/KernelSU-Next/commit/$KSU_SHA) |"
-            else
-              echo "| **KSU Commit** | [\`${KSU_SHA:0:8}\`](https://github.com/tiann/KernelSU/commit/$KSU_SHA) |"
-            fi
-          else
-            echo "| **KSU Commit** | unknown |"
-          fi
-          
           if [ "${{ env.OP_SUSFS }}" = true ]; then
-            echo "| **SUSFS Version** | ${SUSVER:-unknown} |"
-            
-            if [ "$SUSFS_SHA" != "unknown" ]; then
-              echo "| **SUSFS Commit** | [\`${SUSFS_SHA:0:8}\`](https://gitlab.com/simonpunk/susfs4ksu/-/commit/$SUSFS_SHA) |"
-            else
-              echo "| **SUSFS Commit** | unknown |"
-            fi
+            echo "SUSFS Version: ${SUSVER:-unknown}"
+            echo "SUSFS commit SHA: $SUSFS_SHA"
           fi
-          
+          echo "Optimization: ${{ inputs.optimize_level }}"
+          echo "Clean Build: ${{ inputs.clean }}"
           echo ""
-          echo "### 🔧 OnePlus Features"
+          echo "=== OnePlus Features ==="
+          echo "BBR: ${{ env.OP_BBR }}"
+          echo "BBG: ${{ env.OP_BBG }}"
+          echo "HMBIRD SCX: ${{ env.OP_HMBIRD }}"
+          echo "TTL: ${{ env.OP_TTL }}"
+          echo "IP_SET & IPv6 NAT: ${{ env.OP_IP_SET }}"
+          echo "Unicode Fix: ${{ env.OP_UNICODE }}"
+          echo "NTSync: ${{ env.OP_NTSYNC }}"
+          echo "Droidspaces: ${{ env.OP_DS }}"
           echo ""
-          echo "| Feature | Status |"
-          echo "|---------|--------|"
-          echo "| **BBR** | ${{ env.OP_BBR }} |"
-          echo "| **BBG** | ${{ env.OP_BBG }} |"
-          echo "| **HMBIRD SCX** | ${{ env.OP_HMBIRD }} |"
-          echo "| **TTL** | ${{ env.OP_TTL }} |"
-          echo "| **IP_SET & IPv6 NAT** | ${{ env.OP_IP_SET }} |"
-          echo "| **Unicode Fix** | ${{ env.OP_UNICODE }} |"
-          echo "| **NTSync** | ${{ env.OP_NTSYNC }} |"
-          echo "| **Droidspaces** | ${{ env.OP_DS }} |"
-          
-          echo ""
-          echo "### 📊 Build Metrics"
-          echo ""
-          echo "| Metric | Value |"
-          echo "|--------|-------|"
-          echo "| **Optimization** | ${{ inputs.optimize_level }} |"
-          echo "| **Clean Build** | ${{ inputs.clean }} |"
-          echo "| **Build Time** | ${{ steps.collect_stats.outputs.build_time }}s |"
-          
+          echo "Image SHA256: ${{ steps.collect_stats.outputs.image_sha256 }}"
+          echo "AnyKernel3 ZIP SHA256: ${{ steps.create_zip.outputs.zip_sha256 }}"
+          echo "Compiler: ${CLANG_VERSION:-unknown}"
+          echo "Warnings Count: ${{ steps.collect_stats.outputs.warnings_count }}"
+          echo "Build Time: ${{ steps.collect_stats.outputs.build_time }}s"
           if [ "${{ inputs.clean }}" == "false" ]; then
-            echo "| **ccache Hit Rate** | ${{ steps.ccache_stats.outputs.hit_rate }} |"
-            echo "| **ccache Direct Rate** | ${{ steps.ccache_stats.outputs.direct_rate }} |"
+            echo "ccache Hit Rate: ${{ steps.ccache_stats.outputs.hit_rate }}"
+            echo "ccache Direct Rate: ${{ steps.ccache_stats.outputs.direct_rate }}"
+          else
+            echo "ccache: Disabled (clean build)"
           fi
-          
-          echo "| **Image SHA256** | \`${{ steps.collect_stats.outputs.image_sha256 }}\` |"
-          echo "| **Warnings** | ${{ steps.collect_stats.outputs.warnings_count }} |"
-          echo "| **Compiler** | \`${CLANG_VERSION:-unknown}\` |"
-          echo "| **Artifact Name** | \`${{ env.ZIP_NAME }}\` |"
-          echo "| **AnyKernel3 SHA256** | \`${{ steps.create_zip.outputs.zip_sha256 }}\` |"
+          echo "Artifact Name: ${{ env.ZIP_NAME }}"
         } | tee summary.txt
         
         {
