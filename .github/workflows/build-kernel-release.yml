@@ -29,6 +29,11 @@ on:
           - android13-5.15
           - android12-5.10
         default: OOS14+15+16
+      device_model:
+        description: 'Filter by specific device model (e.g. OP-ACE-3, OP12). Leave empty to build all matching devices.'
+        required: false
+        type: string
+        default: ''
       ksu_options:
         description: 'Enter KernelSU build json'
         required: true
@@ -170,6 +175,13 @@ jobs:
               ;;
           esac
           
+          # Apply device model filter if specified
+          device_model="${{ inputs.device_model }}"
+          if [ -n "$device_model" ]; then
+            jq_filter="$jq_filter | map(select(.model == \"$device_model\"))"
+            echo "📱 Device model filter applied: $device_model"
+          fi
+          
           filtered=$(jq -c "$jq_filter" matrix.json)
           count=$(jq 'length' <<<"$filtered")
           
@@ -181,7 +193,11 @@ jobs:
           ')
           
           if [ "$count" -eq 0 ]; then
-            echo "::error::No config files found for input '$input' after applying filters!"
+            if [ -n "$device_model" ]; then
+              echo "::error::No config files found for input '$input' and model '$device_model' after applying filters!"
+            else
+              echo "::error::No config files found for input '$input' after applying filters!"
+            fi
             echo ""
             echo "Available configurations:"
             jq -r '.[] | "  - \(.model) (\(.os_version), \(.android_version)-\(.kernel_version))"' matrix.json
@@ -458,6 +474,7 @@ jobs:
           
           **Target:** ${{ inputs.op_model }}  
           **Devices:** ${{ steps.set-matrix.outputs.count }}  
+          **Device Filter:** ${{ inputs.device_model || 'None (all devices)' }}  
           
           **Configuration:**
           EOF
