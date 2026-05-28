@@ -28,18 +28,18 @@ on:
           - android14-6.1
           - android13-5.15
           - android12-5.10
-        default: OOS14+15+16
+        default: OOS15
       device_model:
         description: 'Filter by specific device model. Select "All" to build all matching devices.'
         required: false
         type: choice
         options:
+          - All
           - OP-ACE-3
           - OP-ACE-3-PRO
           - OP-ACE-6
           - OP-ACE-6T
-          - All
-        default: All
+        default: OP-ACE-3
       ksu_options:
         description: 'Enter KernelSU build json'
         required: true
