@@ -1499,6 +1499,20 @@ runs:
         CONFIG_NETFILTER_XT_TARGET_REJECT=y
         CONFIG_NETFILTER_XT_TARGET_LOG=y
         CONFIG_NETFILTER_XT_MATCH_RECENT=y
+        # Docker/runc support: User namespaces (required for proc/self/setgroups file)
+        CONFIG_USER_NS=y
+        # Docker/runc support: Filesystem context API (fsopen/fsconfig/fsmount for procfs mounting)
+        CONFIG_FS_CONTEXT=y
+        # Docker/runc support: Complete namespace isolation
+        CONFIG_IPC_NS=y
+        CONFIG_NET_NS=y
+        CONFIG_UTS_NS=y
+        # Docker/runc support: Seccomp syscall filtering
+        CONFIG_SECCOMP=y
+        CONFIG_SECCOMP_FILTER=y
+        # Docker/runc support: Cgroup controllers for container resource management
+        CONFIG_CGROUP_PIDS=y
+        CONFIG_CGROUP_DEVICE=y
         EOF
         
         echo "✅ Droidspaces Support applied"
