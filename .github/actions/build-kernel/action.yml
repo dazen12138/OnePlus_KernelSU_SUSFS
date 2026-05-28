@@ -1504,6 +1504,18 @@ runs:
         echo "✅ Droidspaces Support applied"
         echo "::endgroup::"
 
+    - name: Add Docker cgroup v2 support
+      shell: bash
+      run: |
+        set -euo pipefail
+        echo "Add Docker cgroup v2 support"
+        cat >> "$COMMON_KERNEL_FOLDER/arch/arm64/configs/gki_defconfig" <<EOF
+        CONFIG_CFS_BANDWIDTH=y
+        CONFIG_MEMCG_SWAP=y
+        CONFIG_CGROUP_MISC=y
+        CONFIG_CGROUP_NET_CLASSID=y
+        EOF
+
     - name: Add Build based configs
       shell: bash
       run: |
@@ -1515,22 +1527,6 @@ runs:
         CONFIG_OPTIMIZE_INLINING=y
         CONFIG_FRAME_WARN=0
         CONFIG_TRACEPOINTS=y
-        EOF
-
-    - name: Add Docker cgroup v2 support
-      shell: bash
-      run: |
-        set -euo pipefail
-        echo "Add Docker cgroup v2 support"
-        cat >> "$COMMON_KERNEL_FOLDER/arch/arm64/configs/gki_defconfig" <<EOF
-        CONFIG_CFS_BANDWIDTH=y
-        CONFIG_MEMCG_SWAP=y
-        # CONFIG_MEMCG_SWAP_ENABLED is not set — enabling it causes boot loops
-        # on Android devices with ZRAM due to swap accounting overhead.
-        CONFIG_BLK_CGROUP=y
-        CONFIG_CGROUP_MISC=y
-        CONFIG_CGROUP_NET_PRIO=y
-        CONFIG_CGROUP_NET_CLASSID=y
         EOF
 
     - name: Add RUST build configs
