@@ -1507,9 +1507,9 @@ runs:
         # Android 13+ uses cgroup v2 natively; cgroup_no_v1=all prevents v1 from
         # stealing controllers (cpu, memory, cpuset, blkio) so Docker can use them
         # Docker CPU limit support (cpu cfs quota/period) — default n, needed by Docker
-        CONFIG_CFS_BANDWIDTH=y
+        # CONFIG_CFS_BANDWIDTH=y?
         # Docker PID limit support — simple controller, no runtime overhead
-        CONFIG_CGROUP_PIDS=y
+        # CONFIG_CGROUP_PIDS=y
         EOF
 
         # Append cgroup_no_v1=all to existing CONFIG_CMDLINE
@@ -1518,7 +1518,7 @@ runs:
         sed -i 's/^# CONFIG_CMDLINE_EXTEND is not set$/CONFIG_CMDLINE_EXTEND=y/' "$DEFCONFIG"
         sed -i 's/^CONFIG_CMDLINE_FORCE=y$/CONFIG_CMDLINE_FORCE=n/' "$DEFCONFIG"
 
-        grep -E '^CONFIG_(CFS_BANDWIDTH|CGROUP_PIDS)=y' "$DEFCONFIG" | while IFS='=' read -r k v; do echo "  ✅ $k=$v"; done
+        # grep -E '^CONFIG_(CFS_BANDWIDTH|CGROUP_PIDS)=y' "$DEFCONFIG" | while IFS='=' read -r k v; do echo "  ✅ $k=$v"; done
         grep '^CONFIG_CMDLINE=' "$DEFCONFIG" | grep -o 'cgroup_no_v1=all' | head -1 | xargs -I{} echo "  ✅ {} applied to CMDLINE"
         
         echo "✅ Droidspaces Support applied"
