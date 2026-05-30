@@ -1503,24 +1503,20 @@ runs:
         CONFIG_USER_NS=y
         # Docker/runc support: Filesystem context API (runc prefers fsopen/fsconfig/fsmount)
         CONFIG_FS_CONTEXT=y
-        # Docker/runc support: move all cgroup controllers to v2 unified hierarchy
-        # Android 13+ uses cgroup v2 natively; cgroup_no_v1=all prevents v1 from
-        # stealing controllers (cpu, memory, cpuset, blkio) so Docker can use them
-        # Docker CPU limit support (cpu cfs quota/period) — default n, needed by Docker
-        # CONFIG_CFS_BANDWIDTH=y?
+        # Docker CPU limit support (cpu cfs quota/period) — default n, safe
+        CONFIG_CFS_BANDWIDTH=y
         # Docker PID limit support — simple controller, no runtime overhead
-        # CONFIG_CGROUP_PIDS=y
+        CONFIG_CGROUP_PIDS=y
         EOF
 
-        # Append cgroup_no_v1=all to existing CONFIG_CMDLINE
+        # Move only cpu+memory controllers to cgroup v2 for Docker/Beszel.
+        # Keep cpuset, blkio, freezer in v1 — these are critical for OOS15/Android.
         DEFCONFIG="$COMMON_KERNEL_FOLDER/arch/arm64/configs/gki_defconfig"
-        sed -i 's/^CONFIG_CMDLINE="\(.*\)"$/CONFIG_CMDLINE="\1 cgroup_no_v1=all"/' "$DEFCONFIG"
-        sed -i 's/^# CONFIG_CMDLINE_EXTEND is not set$/CONFIG_CMDLINE_EXTEND=y/' "$DEFCONFIG"
-        sed -i 's/^CONFIG_CMDLINE_FORCE=y$/CONFIG_CMDLINE_FORCE=n/' "$DEFCONFIG"
+        sed -i 's/^CONFIG_CMDLINE="\(.*\)"$/CONFIG_CMDLINE="\1 cgroup_no_v1=cpu,cpuacct,memory"/' "$DEFCONFIG"
 
-        # grep -E '^CONFIG_(CFS_BANDWIDTH|CGROUP_PIDS)=y' "$DEFCONFIG" | while IFS='=' read -r k v; do echo "  ✅ $k=$v"; done
-        grep '^CONFIG_CMDLINE=' "$DEFCONFIG" | grep -o 'cgroup_no_v1=all' | head -1 | xargs -I{} echo "  ✅ {} applied to CMDLINE"
-        
+        grep -q 'cgroup_no_v1=cpu,cpuacct,memory' "$DEFCONFIG" && \
+          echo "  ✅ cgroup_no_v1=cpu,cpuacct,memory applied to CMDLINE" || \
+          echo "  ❌ FAILED to apply cgroup_no_v1"
         echo "✅ Droidspaces Support applied"
         echo "::endgroup::"
 
