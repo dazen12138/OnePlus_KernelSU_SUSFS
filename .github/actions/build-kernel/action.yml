@@ -1499,6 +1499,10 @@ runs:
         CONFIG_NETFILTER_XT_TARGET_REJECT=y
         CONFIG_NETFILTER_XT_TARGET_LOG=y
         CONFIG_NETFILTER_XT_MATCH_RECENT=y
+        # Docker/runc support: User namespaces (required for proc/self/setgroups)
+        CONFIG_USER_NS=y
+        # Docker/runc support: Filesystem context API (runc prefers fsopen/fsconfig/fsmount)
+        CONFIG_FS_CONTEXT=y
         EOF
         
         echo "✅ Droidspaces Support applied"
