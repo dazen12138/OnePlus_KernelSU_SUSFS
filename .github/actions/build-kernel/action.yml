@@ -1505,14 +1505,15 @@ runs:
         CONFIG_FS_CONTEXT=y
         EOF
 
-        # Move only cpu+memory controllers to cgroup v2 for Docker/Beszel.
-        # Keep cpuset, blkio, freezer in v1 — these are critical for OOS15/Android.
         DEFCONFIG="$COMMON_KERNEL_FOLDER/arch/arm64/configs/gki_defconfig"
-        sed -i 's/^CONFIG_CMDLINE="\(.*\)"$/CONFIG_CMDLINE="\1 cgroup_no_v1=cpu,cpuacct"/' "$DEFCONFIG"
+        CGROUP_NO_V1="cpu,cpuacct"
+        sed -i "s/^CONFIG_CMDLINE=\"\(.*\)\"\$/CONFIG_CMDLINE=\"\1 cgroup_no_v1=$CGROUP_NO_V1\"/" "$DEFCONFIG"
 
-        grep -q 'cgroup_no_v1=cpu,cpuacct' "$DEFCONFIG" && \
-          echo "  ✅ cgroup_no_v1 applied to CMDLINE" || \
+        if grep -q 'cgroup_no_v1=cpu,cpuacct' "$DEFCONFIG"; then
+          echo "  ✅ cgroup_no_v1=$CGROUP_NO_V1 applied"
+        else
           echo "  ❌ FAILED to apply cgroup_no_v1"
+        fi
         echo "✅ Droidspaces Support applied"
         echo "::endgroup::"
 
