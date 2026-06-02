@@ -1506,10 +1506,21 @@ runs:
         EOF
 
         DEFCONFIG="$COMMON_KERNEL_FOLDER/arch/arm64/configs/gki_defconfig"
-        CGROUP_NO_V1="cpu,cpuacct"
+        # cgroup_no_v1: move controllers from v1 to v2 so Docker in containers
+        # can see them. KSU/SUSFS already break kABI, so GKI restrictions don't apply.
+        #
+        # SAFETY:
+        #   cpu,cpuacct - ✅ Already tested, safe
+        #   cpuset      - ⚠️ Android uses v1 for app CPU affinity (perf impact, NOT boot crash)
+        #   io,blkio    - ✅ Low risk, Android doesn't heavily use IO cgroups v1
+        #   pids        - ✅ Low risk
+        #   memory      - ❌ Boot hang confirmed by user
+        #   devices     - ❌ Android uses v1 for app isolation
+        #   freezer     - ❌ Android uses v1 for app freezing
+        CGROUP_NO_V1="cpu,cpuacct,cpuset,io,blkio,pids"
         sed -i "s/^CONFIG_CMDLINE=\"\(.*\)\"\$/CONFIG_CMDLINE=\"\1 cgroup_no_v1=$CGROUP_NO_V1\"/" "$DEFCONFIG"
 
-        if grep -q 'cgroup_no_v1=cpu,cpuacct' "$DEFCONFIG"; then
+        if grep -q "cgroup_no_v1=$CGROUP_NO_V1" "$DEFCONFIG"; then
           echo "  ✅ cgroup_no_v1=$CGROUP_NO_V1 applied"
         else
           echo "  ❌ FAILED to apply cgroup_no_v1"
